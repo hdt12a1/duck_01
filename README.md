@@ -33,3 +33,9 @@ Fills a range of elements with a specified value
 * Memory that is allocated after the program is already complied and running
 * Use the "new" operator to allocate memory in the heap rather than the stack
 * Usefull when we don't know how much memory we will need. Makes our programs more flexible especially when accepting user input.
+
+## Function Templates
+
+* describes waht a function looks like.
+* Can be used to generate as many ovverloaded function
+* Each using different data types
