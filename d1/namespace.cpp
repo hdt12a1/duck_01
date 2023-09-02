@@ -14,6 +14,5 @@ int main(int argc, char const *argv[])
 
     std::cout << "Duck " << x << std::endl;
     std::cout << "Duck " << x << std::endl;
-    std::
     return 0;
 }
