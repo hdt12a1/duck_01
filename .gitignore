@@ -1,5 +1,11 @@
-.vscode/
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
 
 *.exe
+# Unignore all dirs
+!*/
 
-*.*
+.vscode/
