@@ -11,3 +11,9 @@ C++ Tutorial
 
 > [!NOTE]
 > hello 
+
+> [!IMPORTANT]  
+> Crucial information necessary for users to succeed.
+
+> [!WARNING]  
+> Critical content demanding immediate user attention due to potential risks.
