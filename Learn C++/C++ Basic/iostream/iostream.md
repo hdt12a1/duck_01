@@ -2,7 +2,7 @@
 
 **insertion operator (<<)**
 
-```
+```cpp
 #include <iostream> // for std::cout
 
 int main()
