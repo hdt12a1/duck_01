@@ -2,7 +2,7 @@
 
 **insertion operator (<<)**
 
-```cpp
+```cpp showLineNumbers
 #include <iostream> // for std::cout
 
 int main()
