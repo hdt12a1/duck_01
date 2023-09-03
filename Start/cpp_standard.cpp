@@ -1,10 +1,19 @@
 #include <iostream>
 
-
-int main(int argc, char const *argv[])
+void doNothing(int&) // Don't worry about what & is for now, we're just using it to trick the compiler into thinking variable x is used
 {
-    std::cout << "Hello World" << std::endl;
-    std::cout << "C++ Standard Version: " << __cplusplus << std::endl;
-    /*comment*/
+    std::cout << "hello \n";
+}
+
+int main()
+{
+    // define an integer variable named x
+    int x; // this variable is uninitialized
+
+    doNothing(x); // make the compiler think we're assigning a value to this variable
+
+    // print the value of x to the screen (who knows what we'll get, because x is uninitialized)
+    std::cout << x << '\n';
+
     return 0;
 }
