@@ -10,7 +10,7 @@ There are 6 basic ways to initialize variables in C++:
 + int e = {8} copy list init
 + int f{} 
 */
-
+/* test new laptop zenbook */
 int main(int argc, char const *argv[])
 {
     [[maybe_unused]] int x { 5 };
