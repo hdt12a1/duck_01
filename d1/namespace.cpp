@@ -12,7 +12,7 @@ using namespace first;
 int main(int argc, char const *argv[])
 {
     // int x;
-
+    // test git config unset
     std::cout << "Duck " << x << std::endl;
     std::cout << "Duck " << x << std::endl;
     return 0;
