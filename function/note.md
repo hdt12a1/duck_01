@@ -27,7 +27,7 @@ known at compile-time ( and all of the operators and functions called must suppo
 - A constexpr variable can only be a compile-time constant. 
 - If the initialization value of a constexpr variable is not a constant expression, the compiler will error.
 
-```cpp:
+```cpp
 #include <iostream>
 
 int five()
