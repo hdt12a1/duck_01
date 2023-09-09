@@ -51,3 +51,23 @@ int main()
     return 0;
 }
 ```
+
+> [!NOTE]
+> Any variable that should not be modification after initlization and whose initlization is known at the compile-time shoud be declare as **constexpr**
+> Any variable that should not be modification after initlization and whose initlizer is not known at compile-time should be declared as **const** 
+
+
+> [!IMPORTANT]
+> Because long literals can be hard to read, C++14 also adds the ability to use a quotation mark (') as a digit separator
+
+```cpp
+#include <iostream>
+
+int main()
+{
+    int bin { 0b1011'0010 };  // assign binary 1011 0010 to the variable
+    long value { 2'132'673'462 }; // much easier to read than 2132673462
+/* int bin { 0b'1011'0010 };  // error: ' used before first digit of value */
+    return 0;
+}
+```
