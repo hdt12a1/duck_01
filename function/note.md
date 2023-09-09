@@ -24,3 +24,30 @@ known at compile-time ( and all of the operators and functions called must suppo
 - any const variable that is initialized with a non-constant expression is a runtime constant.
 
 **The `**constexpr**` keywork**
+- A constexpr variable can only be a compile-time constant. 
+- If the initialization value of a constexpr variable is not a constant expression, the compiler will error.
+
+```cpp:
+#include <iostream>
+
+int five()
+{
+    return 5;
+}
+
+int main()
+{
+    constexpr double gravity { 9.8 }; // ok: 9.8 is a constant expression
+    constexpr int sum { 4 + 5 };      // ok: 4 + 5 is a constant expression
+    constexpr int something { sum };  // ok: sum is a constant expression
+
+    std::cout << "Enter your age: ";
+    int age{};
+    std::cin >> age;
+
+    constexpr int myAge { age };      // compile error: age is not a constant expression
+    constexpr int f { five() };       // compile error: return value of five() is not a constant expression
+
+    return 0;
+}
+```
