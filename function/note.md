@@ -23,4 +23,4 @@ known at compile-time ( and all of the operators and functions called must suppo
 **Runtime const**
 - any const variable that is initialized with a non-constant expression is a runtime constant.
 
-**The `constexpr` keywork
+**The **`constexpr`** keywork**
