@@ -184,3 +184,188 @@ int main(int argc, char const *argv[])
 > doesn't support reference to reference, this syntax was repurposed in C++ 11.
 
 # Lvalue references to const
+
+## Lvalue reference to const
+* Lvalue references to const can bind to non-modifiable lvalue:
+
+```cpp
+#include <iostream>
+
+int main()
+{
+    const int x { 5 };    // x is a non-modifiable lvalue
+    const int& ref { x }; // okay: ref is a an lvalue reference to a const value
+
+    std::cout << ref << '\n'; // okay: we can access the const object
+    ref = 6;                  // error: we can not modify an object through a const reference
+
+    return 0;
+}
+```
+
+## Initializing an lvalue reference to const with a modifiable lvalue.
+* Lvalue references to const can also bind to modifialbe lvalues. 
+* In such case, the object being referenced is treated as const when accessed through the referece.
+
+
+```cpp
+#include <iostream>
+
+int main()
+{
+    int x { 5 };          // x is a modifiable lvalue
+    const int& ref { x }; // okay: we can bind a const reference to a modifiable lvalue
+
+    std::cout << ref << '\n'; // okay: we can access the object through our const reference
+    ref = 7;                  // error: we can not modify an object through a const reference
+
+    x = 6;                // okay: x is a modifiable lvalue, we can still modify it through the original identifier
+
+    return 0;
+}
+
+```
+
+## Initializing an lvalue reference to const with an rvalue
+
+```cpp
+#include <iostream>
+
+int main()
+{
+    const int& ref { 5 }; // okay: 5 is an rvalue
+
+    std::cout << ref << '\n'; // prints 5
+
+    return 0;
+}
+```
+
+**A temporary object is an object that is created for temporay use within a single expression.**
+* Temporay objects have no scope at all. This means a temporary object can only be used directly at the point where it is created, since there is no way to refer to it beyond that point.
+
+> [!IMPORTANT]
+> When a const lvalue reference is bound to a temporary objet, the lifetime of the temporary object is extended to match the lifetime of the reference.
+
+```cpp
+#include <iostream>
+
+int main()
+{
+    const int& ref { 5 }; // The temporary object holding value 5 has its lifetime extended to match ref
+
+    std::cout << ref << '\n'; // Therefore, we can safely use it here
+
+    return 0;
+} // Both ref and the temporary object die here
+
+```
+
+> [!NOTE]
+> lvalue references can only bind to modifiable lvalues
+> lvalue references to const can bind to modificable lvalues, non-modifialbe value and rvalue
+
+## constexpr lvalue references
+* constexpr references have a particular limitation: They can only be bound to object with static duration
+* A constexpr reference cannot bind to a (non-static) local variable. This is because the address of local variables is not known until the function they are defined within is actually called.
+
+
+```cpp
+int g_x { 5 };
+
+int main()
+{
+    [[maybe_unused]] constexpr int& ref1 { g_x }; // ok, can bind to global
+
+    static int s_x { 6 };
+    [[maybe_unused]] constexpr int& ref2 { s_x }; // ok, can bind to static local
+
+    int x { 6 };
+    [[maybe_unused]] constexpr int& ref3 { x }; // compile error: can't bind to non-static object
+
+    return 0;
+}
+
+```
+
+> [!NOTE]
+> When defining a constexpr reference to const variable, we need to apply both **constexpr** and const
+
+# Pass by lvalue reference
+
+## Some objects are expensive to copy
+
+* Most of the type provied by the standard library are **class type**
+* Class type are usually expensive to copy.
+
+## Pass by value
+* one way to avoud making an expensive copy of an argument when calling a function is to use **pass by reference** instead of **pass by value**
+
+```cpp
+#include <iostream>
+#include <string>
+
+void printValue(std::string& y) // type changed to std::string&
+{
+    std::cout << y << '\n';
+} // y is destroyed here
+
+int main()
+{
+    std::string x { "Hello, world!" };
+
+    printValue(x); // x is now passed by reference into reference parameter y (inexpensive)
+
+    return 0;
+}
+```
+
+> [!IMPORTANT]
+> Passy b reference allows us to pass arguments to a funciton without making copies  of those arguments each time the function is called.
+
+## Pass by reference allows us to change the value of an argument
+```cpp
+#include <iostream>
+
+void addOne(int& y) // y is bound to the actual object x
+{
+    ++y; // this modifies the actual object x
+}
+
+int main()
+{
+    int x { 5 };
+
+    std::cout << "value = " << x << '\n';
+
+    addOne(x);
+
+    std::cout << "value = " << x << '\n'; // x has been modified
+
+    return 0;
+}
+```
+
+## Pass by reference can oly accept modifiable lvalue arguments
+```cpp
+#include <iostream>
+
+void printValue(int& y) // y only accepts modifiable lvalues
+{
+    std::cout << y << '\n';
+}
+
+int main()
+{
+    int x { 5 };
+    printValue(x); // ok: x is a modifiable lvalue
+
+    const int z { 5 };
+    printValue(z); // error: z is a non-modifiable lvalue
+
+    printValue(5); // error: 5 is an rvalue
+
+    return 0;
+}
+
+```
