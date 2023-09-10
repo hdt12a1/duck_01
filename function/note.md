@@ -71,3 +71,85 @@ int main()
     return 0;
 }
 ```
+
+### Consteval
+- C++ 20 introduces the keyword consteval, which is used to indicate that a funciton must evaluate at compile-time, otherwise a compile error will result.
+
+```cpp
+#include <iostream>
+
+consteval int greater(int x, int y) // function is now consteval
+{
+    return (x > y ? x : y);
+}
+
+int main()
+{
+    constexpr int g { greater(5, 6) };              // ok: will evaluate at compile-time
+    std::cout << g << '\n';
+
+    std::cout << greater(5, 6) << " is greater!\n"; // ok: will evaluate at compile-time
+
+    int x{ 5 }; // not constexpr
+    std::cout << greater(x, 6) << " is greater!\n"; // error: consteval functions must evaluate at compile-time
+
+    return 0;
+}
+```
+
+### Unnamed (anonymous) namespaces
+* An unnamed namespace is a namespace that is defined without a name
+
+```cpp
+#include <iostream>
+
+namespace // unnamed namespace
+{
+    void doSomething() // can only be accessed in this file
+    {
+        std::cout << "v1\n";
+    }
+}
+
+int main()
+{
+    doSomething(); // we can call doSomething() without a namespace prefix
+
+    return 0;
+}
+```
+
+### inline namespace
+* An inline namespace is a namespace that is typically used to version content.
+* Anything declared inside an inline namespace is considered part of the parent namespace. However, unlike unnamed namespace, inline namespace don't effect linkage.
+
+```cpp
+#include <iostream>
+
+inline namespace V1 // declare an inline namespace named V1
+{
+    void doSomething()
+    {
+        std::cout << "V1\n";
+    }
+}
+
+namespace V2 // declare a normal namespace named V2
+{
+    void doSomething()
+    {
+        std::cout << "V2\n";
+    }
+}
+
+int main()
+{
+    V1::doSomething(); // calls the V1 version of doSomething()
+    V2::doSomething(); // calls the V2 version of doSomething()
+
+    doSomething(); // calls the inline version of doSomething() (which is V1)
+
+    return 0;
+}
+
+```
