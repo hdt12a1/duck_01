@@ -22,4 +22,18 @@ int main()
 ## switch case
 
 * We start a switch statement by using a switch keyword, followded by parentheses with the conditional expression that we would like to evaluate inside.
-* 
+
+> [!NOTE]
+> The one restriction is that the condition must evaluate to an interger type or an enumerated type or be convertible to one.
+
+### Brace initialization disalows narrowing conversions
+
+```cpp
+
+int main()
+{
+    int i { 3.5 }; // won't compile
+
+    return 0;
+}
+```
