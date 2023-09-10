@@ -182,3 +182,5 @@ int main(int argc, char const *argv[])
 > [!NOTE]
 > A reference to a reference would have syntax int && - but since C++ 
 > doesn't support reference to reference, this syntax was repurposed in C++ 11.
+
+# Lvalue references to const
