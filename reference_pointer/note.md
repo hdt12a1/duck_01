@@ -157,6 +157,7 @@ When an object being referenced is destroyed before a reference to it, the refer
 
 ### References are not objects
 * Referens are not object in C++.
+* A reference is not required to exist or occupy storage.
 * they can't used anywhere an object is required
     - You can't have a reference to a reference, since an lvalue must reference an identifiable object.
 
