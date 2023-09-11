@@ -295,3 +295,459 @@ int main()
     return 0;
 }
 ```
+
+---
+
+# 9.10 Pass by address
+
+**Recap**: In prior lessons, we have covered two different ways to pass an argument to a function
+- Pass by value
+- Pass by reference
+
+## Pass by address
+- With pass by address, instead of providing an objet as an argument, the caller provides an object's address (via a pointer)
+- This pointer is copied into a pointer parameter of the called function
+
+
+```cpp
+#include <iostream>
+#include <string>
+
+void printByValue(std::string val) // The function parameter is a copy of str
+{
+    std::cout << val << '\n'; // print the value via the copy
+}
+
+void printByReference(const std::string& ref) // The function parameter is a reference that binds to str
+{
+    std::cout << ref << '\n'; // print the value via the reference
+}
+
+void printByAddress(const std::string* ptr) // The function parameter is a pointer that holds the address of str
+{
+    std::cout << *ptr << '\n'; // print the value via the dereferenced pointer
+}
+
+int main()
+{
+    std::string str{ "Hello, world!" };
+
+    printByValue(str); // pass str by value, makes a copy of str
+    printByReference(str); // pass str by reference, does not make a copy of str
+    printByAddress(&str); // pass str by address, does not make a copy of str
+
+    return 0;
+}
+```
+
+## Pass by address does not make a copy of the object being pointed to
+- Just like pass by reference, pass by address is fast, and avoids making a copy of the argument object
+
+---
+
+## Pass by address allows the function to modify the argument's value
+
+```cpp
+#include <iostream>
+
+void changeValue(int* ptr) // note: ptr is a pointer to non-const in this example
+{
+    *ptr = 6; // change the value to 6
+}
+
+int main()
+{
+    int x{ 5 };
+
+    std::cout << "x = " << x << '\n';
+
+    changeValue(&x); // we're passing the address of x to the function
+
+    std::cout << "x = " << x << '\n';
+
+    return 0;
+}
+```
+
+---
+
+## Prefer pass by (const) reference
+
+```cpp
+#include <iostream>
+
+void printByValue(int val) // The function parameter is a copy of the argument
+{
+    std::cout << val << '\n'; // print the value via the copy
+}
+
+void printByReference(const int& ref) // The function parameter is a reference that binds to the argument
+{
+    std::cout << ref << '\n'; // print the value via the reference
+}
+
+void printByAddress(const int* ptr) // The function parameter is a pointer that holds the address of the argument
+{
+    std::cout << *ptr << '\n'; // print the value via the dereferenced pointer
+}
+
+int main()
+{
+    printByValue(5);     // valid (but makes a copy)
+    printByReference(5); // valid (because the parameter is a const reference)
+    printByAddress(&5);  // error: can't take address of r-value
+
+    return 0;
+}
+```
+
+## Pass by address for "optional" argument
+- One of the more common uses for pass by address is to allow a function to accept an "option" argument.
+
+```cpp
+#include <iostream>
+#include <string>
+
+void greet(std::string* name=nullptr)
+{
+    std::cout << "Hello ";
+    std::cout << (name ? *name : "guest") << '\n';
+}
+
+int main()
+{
+    greet(); // we don't know who the user is yet
+
+    std::string joe{ "Joe" };
+    greet(&joe); // we know the user is joe
+
+    return 0;
+}
+```
+- However, in many cases, function overloading is a better alternative to achieve the same result
+
+```cpp
+#include <iostream>
+#include <string>
+#include <string_view>
+
+void greet(std::string_view name)
+{
+    std::cout << "Hello " << name << '\n';
+}
+
+void greet()
+{
+    greet("guest");
+}
+
+int main()
+{
+    greet(); // we don't know who the user is yet
+
+    std::string joe{ "Joe" };
+    greet(joe); // we know the user is joe
+
+    return 0;
+}
+```
+
+> [!NOTE]
+> This has a number of advantages: we no longer have to worry about null deferences, and we could pass in a string literal if we wanted
+
+---
+
+## Changing what a pointer parameter points at
+- when we pass an address to a function, that address is copied from the argument into the pointer parameter (which is fine, because copying an address is fast)
+- Now consider the following program:
+
+```cpp
+#include <iostream>
+
+// [[maybe_unused]] gets rid of compiler warnings about ptr2 being set but not used
+void nullify([[maybe_unused]] int* ptr2)
+{
+    ptr2 = nullptr; // Make the function parameter a null pointer
+}
+
+int main()
+{
+    int x{ 5 };
+    int* ptr{ &x }; // ptr points to x
+
+    std::cout << "ptr is " << (ptr ? "non-null\n" : "null\n");
+
+    nullify(ptr);
+
+    std::cout << "ptr is " << (ptr ? "non-null\n" : "null\n");
+    return 0;
+}
+```
+
+---
+## Pass by address... by reference?
+- Just like we can pass a normal variable by reference, we can also pass pointers by reference.
+
+```cpp
+#include <iostream>
+
+void nullify(int*& refptr) // refptr is now a reference to a pointer
+{
+    refptr = nullptr; // Make the function parameter a null pointer
+}
+
+int main()
+{
+    int x{ 5 };
+    int* ptr{ &x }; // ptr points to x
+
+    std::cout << "ptr is " << (ptr ? "non-null\n" : "null\n");
+
+    nullify(ptr);
+
+    std::cout << "ptr is " << (ptr ? "non-null\n" : "null\n");
+    return 0;
+}
+```
+
+---
+## Why using `0` or `NULL` is no longer prefered
+- The literal `0` can be interpreted as either an interger literal, or as a null pointer literal.
+- In certain cases, it can be ambiguous which one we intend
+- The definition of preprocessor macro `NULL` is not defined by the language standard. It can be defined as 0, 0L, ((void*)0)
+- the compiler can figure out which overloaded function you desire by the arguments passed in as part of the function call. when using 0 or null, this can cause problems:
+
+```cpp
+#include <iostream>
+#include <cstddef> // for NULL
+
+void print(int x) // this function accepts an integer
+{
+	std::cout << "print(int): " << x << '\n';
+}
+
+void print(int* ptr) // this function accepts an integer pointer
+{
+	std::cout << "print(int*): " << (ptr ? "non-null\n" : "null\n");
+}
+
+int main()
+{
+	int x{ 5 };
+	int* ptr{ &x };
+
+	print(ptr);  // always calls print(int*) because ptr has type int* (good)
+	print(0);    // always calls print(int) because 0 is an integer literal (hopefully this is what we expected)
+
+	print(NULL); // this statement could do any of the following:
+	// call print(int) (Visual Studio does this)
+	// call print(int*)
+	// result in an ambiguous function call compilation error (gcc and Clang do this)
+
+	print(nullptr); // always calls print(int*)
+
+	return 0;
+}
+```
+
+> [!IMPORTANT]
+> Using `nullptr` removes this ambiguity (it will always call print(int*)), since nullptr will only match a pointer type
+
+## std::nullptr_t 
+- Since `nullptr` ca be differentiated from integer value in function overloads, it must have a different type.
+- nullptr has type `std::nullptr_t`, this type can only hod one value : nullptr.
+- It's useful in one situation
+- If we want to write a function that accepts only anullptr literal argument, we can make the parameter a std::nullptr_t
+
+```cpp
+#include <iostream>
+#include <cstddef> // for std::nullptr_t
+
+void print(std::nullptr_t)
+{
+    std::cout << "in print(std::nullptr_t)\n";
+}
+
+void print(int*)
+{
+    std::cout << "in print(int*)\n";
+}
+
+int main()
+{
+    print(nullptr); // calls print(std::nullptr_t)
+
+    int x { 5 };
+    int* ptr { &x };
+
+    print(ptr); // calls print(int*)
+
+    ptr = nullptr;
+    print(ptr); // calls print(int*) (since ptr has type int*)
+
+    return 0;
+}
+```
+
+- In the above example, the functionn call `print(nullptr)` resolves to the function `print(std::nullptr_t)` over print(int*) becauise it doesn't require a conversion
+
+---
+
+# Return by reference and return by address
+
+## Return by reference
+- Return by reference returns a reference that is obund to the object being returned, which avoids making a copy of the return value.
+
+```cpp
+std::string&       returnByReference(); // returns a reference to an existing std::string (cheap)
+const std::string& returnByReferenceToConst(); // returns a const reference to an existing std::string (cheap)
+
+
+#include <iostream>
+#include <string>
+
+const std::string& getProgramName() // returns a const reference
+{
+    static const std::string s_programName { "Calculator" }; // has static duration, destroyed at end of program
+
+    return s_programName;
+}
+
+int main()
+{
+    std::cout << "This program is named " << getProgramName();
+
+    return 0;
+}
+```
+
+
+## The object being returned by referece must exist after the function returns
+
+## The lifetime extension doesn't work across function boundaries
+- Let's take a look at an example where we return a temporaty by reference
+
+```cpp
+
+#include <iostream>
+
+const int& returnByConstReference()
+{
+    return 5; // returns const reference to temporary object
+}
+
+int main()
+{
+    const int& ref { returnByConstReference() };
+
+    std::cout << ref; // undefined behavior
+
+    return 0;
+}
+```
+
+## Don't return non-const local static variable by reference
+```cpp
+#include <iostream>
+#include <string>
+
+const int& getNextId()
+{
+    static int s_x{ 0 }; // note: variable is non-const
+    ++s_x; // generate the next id
+    return s_x; // and return a reference to it
+}
+
+int main()
+{
+    const int& id1 { getNextId() }; // id1 is a reference
+    const int& id2 { getNextId() }; // id2 is a reference
+
+    std::cout << id1 << id2 << '\n'; // 2 2
+
+    return 0;
+}
+
+```
+
+## Assigning/init a normal variable with a returned reference makes a copy
+- If a function returns a reference, and that reference is used to initlize or assign to a non-reference variable, the return value will be copied.
+
+```cpp
+#include <iostream>
+#include <string>
+
+const int& getNextId()
+{
+    static int s_x{ 0 };
+    ++s_x;
+    return s_x;
+}
+
+int main()
+{
+    const int id1 { getNextId() }; // id1 is a normal variable now and receives a copy of the value returned by reference from getNextId()
+    const int id2 { getNextId() }; // id2 is a normal variable now and receives a copy of the value returned by reference from getNextId()
+
+    std::cout << id1 << id2 << '\n';
+
+    return 0;
+}
+```
+
+## It's okay to return reference parameters by reference
+- If a parameter is passed into a function by reference, it's fate to return that parameter by reference. This make sense: in order to pass an argument to a function, the argument must exits in the scope of the called. when the called funciton returns, that object must still exist in the scope of the caller
+
+```cpp
+#include <iostream>
+#include <string>
+
+// Takes two std::string objects, returns the one that comes first alphabetically
+const std::string& firstAlphabetical(const std::string& a, const std::string& b)
+{
+	return (a < b) ? a : b; // We can use operator< on std::string to determine which comes first alphabetically
+}
+
+int main()
+{
+	std::string hello { "Hello" };
+	std::string world { "World" };
+
+	std::cout << firstAlphabetical(hello, world) << '\n';
+
+	return 0;
+}
+
+```
+
+---
+
+## The caller can mofigy values through the reference
+- when an argument is passed to a function by non-const reference, the function can use the reference to mofigy the value of the argument
+
+```cpp
+
+#include <iostream>
+
+// takes two integers by non-const reference, and returns the greater by reference
+int& max(int& x, int& y)
+{
+    return (x > y) ? x : y;
+}
+
+int main()
+{
+    int a{ 5 };
+    int b{ 6 };
+
+    max(a, b) = 7; // sets the greater of a or b to 7
+
+    std::cout << a << b << '\n';
+
+    return 0;
+}
+```
+
+## Return by address
+- The major advantage of return by address over return by reference is that we can have the function return `nullptr` if there is no valid object return.
+- The major disavantage of return by address is that the caller has to remember to do a `nullptr` check before dereferecing the return value
