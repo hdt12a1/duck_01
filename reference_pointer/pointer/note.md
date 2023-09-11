@@ -153,3 +153,50 @@ int main()
     return 0;
 }
 ```
+
+---
+
+## Checking for null pointers
+
+## Use nullptr to avoid dangling pointers
+---
+# Legacy null pointer literals: 0 and NULL
+- In older code, you may see two other literal value used instead of `nullptr`
+- the first is the literal 0. In the context of a pointer, the literal `0` is specially defined to mean a null value.
+
+```cpp
+int main()
+{
+    float* ptr { 0 };  // ptr is now a null pointer (for example only, don't do this)
+
+    float* ptr2; // ptr2 is uninitialized
+    ptr2 = 0; // ptr2 is now a null pointer (for example only, don't do this)
+
+    return 0;
+}
+```
+
+> [!NOTE]
+> On modern architecture, the address `0` is typically used to represent a null pointer. However, this value is not guaranteed by the c++ standard, and some architecture use other value. the literal 0 when used in the context of a null pointer, will be translated into whatever address the architecture uses to represent a null pointer.
+>
+> There is a preprocessor macro named NULL
+
+```cpp
+#include <cstddef> // for NULL
+
+int main()
+{
+    double* ptr { NULL }; // ptr is a null pointer
+
+    double* ptr2; // ptr2 is uninitialized
+    ptr2 = NULL; // ptr2 is now a null pointer
+
+    return 0;
+}
+```
+
+> [!IMPORTANT]
+> Both `0` and `NULL` should be avoided in modern C++ (used nullptr instead)
+
+> [!NOTE]
+> Favor references over pointers unless the additional capabilities provided by pointers are needed.
