@@ -200,3 +200,98 @@ int main()
 
 > [!NOTE]
 > Favor references over pointers unless the additional capabilities provided by pointers are needed.
+
+---
+
+
+# Pointers and const
+
+## Pointer to const value
+- Pointer to const value is a pointer that points to a constant value
+- To delcare a pointer to a const value, use the `const` keyword before the pointer's data type
+
+```cpp
+int main()
+{
+    const int x{ 5 };
+    const int* ptr { &x }; // okay: ptr is pointing to a "const int"
+
+    *ptr = 6; // not allowed: we can't change a const value
+
+    return 0;
+}
+
+```
+
+> [!NOTE]
+> Just like a reference to const, a pointer to const can point to non-const variables too.
+
+```cpp
+int main()
+{
+    int x{ 5 }; // non-const
+    const int* ptr { &x }; // ptr points to a "const int"
+
+    *ptr = 6;  // not allowed: ptr points to a "const int" so we can't change the value through ptr
+    x = 6; // allowed: the value is still non-const when accessed through non-const identifier x
+
+    return 0;
+}
+```
+
+---
+
+## Const Pointers
+
+- A const pointer is a pointer whose address can not be changed after initialization.
+- To delcare a const pointer, use the `const` keyword afer the asterisk in the pointer declaration
+
+```cppp
+int main()
+{
+    int x{ 5 };
+    int* const ptr { &x }; // const after the asterisk means this is a const pointer
+
+    return 0;
+}
+```
+
+---
+
+## Const pointer to a const value
+
+- Finally, it is possible to declare a const pointer to a const value by using the const keyword both before the type and after the asterisk
+
+```cpp
+int main()
+{
+    int value { 5 };
+    const int* const ptr { &value }; // a const pointer to a const value
+
+    return 0;
+}
+
+```
+
+# Pointer and const recap
+- A non-const pointer can be assigned another address to change what it is pointing at
+- A const pointer always points to the same address, and this address can not be changed
+- A pointer to a non-const value can change the value it is pointing to. These can not point to a const value
+- A pointer to a const value treats the value as const when accessed through the pointer.
+
+```cpp
+int main()
+{
+    int v{ 5 };
+
+    int* ptr0 { &v };             // points to an "int" but is not const itself, so this is a normal pointer.
+    const int* ptr1 { &v };       // points to a "const int" but is not const itself, so this is a pointer to a const value.
+    int* const ptr2 { &v };       // points to an "int" and is const itself, so this is a const pointer (to a non-const value).
+    const int* const ptr3 { &v }; // points to an "const int" and is const itself, so this is a const pointer to a const value.
+
+    // if the const is on the left side of the *, the const belongs to the value
+    // if the const is on the right side of the *, the const belongs to the pointer
+
+    return 0;
+}
+```
