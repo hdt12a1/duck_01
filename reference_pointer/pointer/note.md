@@ -105,3 +105,20 @@ int main()
     return 0;
 }
 ```
+
+# Null pointers
+- When a pointer i holding a null value, it means the pointer i not pointing at anything.
+
+```cpp
+int main()
+{
+    int* ptr {}; // ptr is now a null pointer, and is not holding an address
+
+    return 0;
+}
+
+```
+
+---
+
+## The nullptr keyword
