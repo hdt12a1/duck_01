@@ -122,3 +122,34 @@ int main()
 ---
 
 ## The nullptr keyword
+- the nullptr keyword represents a null pointer literal. we can use nullptr to explicitly initialize or assign a pointer a null value.
+
+```cpp
+int main()
+{
+    int* ptr { nullptr }; // can use nullptr to initialize a pointer to be a null pointer
+
+    int value { 5 };
+    int* ptr2 { &value }; // ptr2 is a valid pointer
+    ptr2 = nullptr; // Can assign nullptr to make the pointer a null pointer
+
+    someFunction(nullptr); // we can also pass nullptr to a function that has a pointer parameter
+
+    return 0;
+}
+```
+
+---- 
+## Dereferencing a null pointer results in undefined behavior
+
+```cpp
+#include <iostream>
+
+int main()
+{
+    int* ptr {}; // Create a null pointer
+    std::cout << *ptr << '\n'; // Dereference the null pointer
+
+    return 0;
+}
+```
