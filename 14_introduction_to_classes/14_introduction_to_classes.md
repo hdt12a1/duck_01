@@ -1176,3 +1176,132 @@ int main()
     return 0;
 }
 ```
+
+> [!NOTE]
+> List initialization prevents narrowing conversions
+> Copy initialization only works with non-explicit constructor
+> List initialization prefers list constructors over other constructors.
+
+## Copy elision
+- Copy elision is a compiler optimization technique that allows the compiler to remove unncessary copying of object.
+- Copy elision in pass by value and return by value
+
+# 14.14 Converting constructors and the explicit keyword
+## User-defined conversions
+```cpp
+#include <iostream>
+
+class Foo
+{
+private:
+    int m_x{};
+public:
+    Foo(int x)
+        : m_x{ x }
+    {
+    }
+
+    int getX() { return m_x; }
+};
+
+void printFoo(Foo f) // has a Foo parameter
+{
+    std::cout << f.getX();
+}
+
+int main()
+{
+    printFoo(5); // we're supplying an int argument
+
+    return 0;
+}
+```
+
+- In this version `printFoo` has a `foo` parameter but we're passing in an argument of type `int`. Because these types do not match, the compiler will try to implicity convert int value 5 to a Foo object so the function can be called.
+
+**A constructor that can be used to perform an implicit conversion is called a converting constructor. By default, all constructors are converting constructors**
+## The explicit keyword
+- We can use the explicit keyword to tell the compiler that a constructor should not be used as a converting constructor.
+- Making a constructor `explicit` has two notable consequances
+    - An explicit constructor cannot be used to do copy initialization or copy list initialization
+    - An explicit constructor cannot be used to do implicit conversions (since this uses copy initialization or copy list initialization)
+
+```cpp
+#include <iostream>
+
+class Dollars
+{
+private:
+    int m_dollars{};
+
+public:
+    explicit Dollars(int d) // now explicit
+        : m_dollars{ d }
+    {
+    }
+
+    int getDollars() { return m_dollars; }
+};
+
+void print(Dollars d)
+{
+    std::cout << "$" << d.getDollars();
+}
+
+int main()
+{
+    print(5); // compilation error because Dollars(int) is explicit
+
+    return 0;
+}
+```
+
+## Explicit constructors can be used for direct and list initialization
+
+- An explicit constructor can still be used for direct and direct initialization
+```cpp
+// Assume Dollars(int) is explicit
+int main()
+{
+    Dollars d1(5); // ok
+    Dollars d2{5}; // ok
+}
+```
+
+## Return by value and explicit constructors
+- When we return a value from a functoin, if that value does not match the return type of the function, an implicit conversion will occur.
+```cpp
+#include <iostream>
+
+class Foo
+{
+public:
+    explicit Foo() // note: explicit (just for sake of example)
+    {
+    }
+
+    explicit Foo(int x) // note: explicit
+    {
+    }
+};
+
+Foo getFoo()
+{
+    // explicit Foo() cases
+    return Foo{ };   // ok
+    return { };      // error: can't implicitly convert initializer list to Foo
+
+    // explicit Foo(int) cases
+    return 5;        // error: can't implicitly convert int to Foo
+    return Foo{ 5 }; // ok
+    return { 5 };    // error: can't implicitly convert initializer list to Foo
+}
+
+int main()
+{
+    return 0;
+}
+```
+
+## Best practices for use of `explicit`
+- Make any constructor that accepts a single argument `explicit` by default. If an implicit conversion between types is both semantically equivalent and performant, you can consider making the constructor non-explicit
