@@ -369,3 +369,51 @@ int main()
 }
 
 ```
+
+# Pass by const lvalue reference
+```cpp
+#include <iostream>
+
+void printValue(const int& y) // y is now a const reference
+{
+    std::cout << y << '\n';
+}
+
+int main()
+{
+    int x { 5 };
+    printValue(x); // ok: x is a modifiable lvalue
+
+    const int z { 5 };
+    printValue(z); // ok: z is a non-modifiable lvalue
+
+    printValue(5); // ok: 5 is a literal rvalue
+
+    return 0;
+}
+```
+
+## Mixing pass by value and pass by reference
+```cpp
+#include <string>
+
+void foo(int a, int& b, const std::string& c)
+{
+}
+
+int main()
+{
+    int x { 5 };
+    const std::string s { "Hello, world!" };
+
+    foo(5, x, s);
+
+    return 0;
+}
+```
+
+## When to pass by (const) reference
+
+## The cost of pass by value vs pass by reference
+
+
